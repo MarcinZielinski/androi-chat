@@ -33,9 +33,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Example of a call to a native method
         TextView tv = (TextView) findViewById(R.id.sample_text);
-        tv.setText(stringFromJNI());
+        if(connectToServer() == 0) {
+            tv.setText("OH MY GOD IM CONNECTED");
+        } else {
+            tv.setText("I tried at lesat....");
+        }
+
     }
 
     @Override
@@ -65,4 +69,5 @@ public class MainActivity extends AppCompatActivity {
      * which is packaged with this application.
      */
     public native String stringFromJNI();
+    public native int connectToServer();
 }
