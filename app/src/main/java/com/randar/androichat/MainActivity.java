@@ -1,9 +1,14 @@
 package com.randar.androichat;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.InputType;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -17,6 +22,11 @@ public class MainActivity extends AppCompatActivity {
         System.loadLibrary("native-lib");
     }
 
+    private String message;
+    private TextView tv;
+    private AlertDialog alertDialog;
+    private EditText messageEditText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,16 +38,64 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Title");
+
+                // Set up the input
+                //final EditText input = new EditText(MainActivity.this);
+                messageEditText = new EditText(MainActivity.this);
+                // Specify the type of input expected
+                messageEditText.setInputType(InputType.TYPE_CLASS_TEXT);
+                builder.setView(messageEditText);
+
+
+                final InputMethodManager imm;
+                messageEditText.requestFocus();
+                imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+
+                // Set up the buttons
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        message = messageEditText.getText().toString();
+                        if(sendMessage(message) == -1) {
+                            tv.setText("Unable to send the message...");
+                        } else {
+                            tv.setText(message);
+                        }
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                alertDialog = builder.show();
+                alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        messageEditText.setFocusable(true);
+                        messageEditText.setFocusableInTouchMode(true);
+                        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                    }
+                });
             }
         });
 
-        TextView tv = (TextView) findViewById(R.id.sample_text);
+        tv = (TextView) findViewById(R.id.sample_text);
         if(connectToServer() == 0) {
             tv.setText("OH MY GOD IM CONNECTED");
         } else {
             tv.setText("I tried at lesat....");
+        }
+
+        if(login("Mrz355") == 0) {
+            tv.setText(tv.getText()+" i'm logged in");
+        } else {
+            tv.setText(tv.getText()+" i'm not logged..");
         }
 
     }
@@ -70,4 +128,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public native String stringFromJNI();
     public native int connectToServer();
+    public native int login(String username);
+    public native int sendMessage(String message);
+    public native int logout(); // TODO: put it int some onStop(), but do not forget to do not able disconnection from server while rotating phone!
 }
