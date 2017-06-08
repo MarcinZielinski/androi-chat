@@ -44,8 +44,9 @@ void *message_receiver(void *argv) {
         }
         log("alreeady reaaaad");
         jstring message = env->NewStringUTF(msg.message);
-        jmethodID method = env->GetMethodID(cls, "newMessage", "(Ljava/lang/String;)V");
-        env->CallVoidMethod(globalInstance, method, message);
+        jstring _username = env->NewStringUTF(msg.name);
+        jmethodID method = env->GetMethodID(cls, "newMessage", "(Ljava/lang/String;Ljava/lang/String;)V");
+        env->CallVoidMethod(globalInstance, method, _username, message);
     }
     javaVM->DetachCurrentThread();
     pthread_exit(NULL);
@@ -92,13 +93,12 @@ Java_com_randar_androichat_MainActivity_stringFromJNI(
 
 JNIEXPORT jint JNICALL
 Java_com_randar_androichat_MainActivity_connectToServer(JNIEnv *env, jobject instance) {
-    log("i'm here in c");
     if((socket_fd = socket(AF_INET,SOCK_STREAM,0)) == -1) {
         _perror("socket");
         return -1;
     }
 
-    char *addr = "10.205.11.113";
+    char *addr = "172.16.1.132";
     uint16_t port = 36000;
 
     struct sockaddr_in in_addr;
