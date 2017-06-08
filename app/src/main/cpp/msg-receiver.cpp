@@ -13,7 +13,7 @@
 #define APPNAME "androi-chat"
 
 int socket_fd;
-
+pthread_t tid;
 char username[MAX_NAME_LEN];
 
 JavaVM* javaVM = NULL;
@@ -30,11 +30,22 @@ void JNI_OnUnload(JavaVM *vm, void *reserved)  {
     javaVM = NULL;
 }
 
+void terminate_thread(int signum) {
+    javaVM->DetachCurrentThread();
+    pthread_exit(0);
+}
 
 void *message_receiver(void *argv) {
     int res = javaVM->AttachCurrentThread(&env, NULL);
     jclass cls = env->GetObjectClass(globalInstance);
     msg_t msg;
+
+    struct sigaction sigact;
+    sigact.sa_flags = 0;
+    sigemptyset(&(sigact.sa_mask));
+    sigact.sa_handler = terminate_thread;
+    sigaction(SIGUSR2,&sigact,NULL);
+
     int s = 1;
     while(s) {
 
@@ -61,7 +72,6 @@ Java_com_randar_androichat_MainActivity_listenCoroutine(JNIEnv *env, jobject ins
     globalClass = (jclass) env->NewGlobalRef(cls);
     globalInstance = env->NewGlobalRef(instance);
 
-    pthread_t tid;
     pthread_attr_t attr;
 
     int pt = pthread_create(&tid,NULL,&message_receiver,NULL);
@@ -170,6 +180,8 @@ Java_com_randar_androichat_MainActivity_sendMessage(JNIEnv *env, jobject instanc
 
 JNIEXPORT jint JNICALL
 Java_com_randar_androichat_MainActivity_logout(JNIEnv *env, jobject instance) {
+    pthread_kill(tid,SIGUSR2);
+
     int res = 0;
     if (socket_fd != -1) {
         if(shutdown(socket_fd, SHUT_RDWR) == -1) {

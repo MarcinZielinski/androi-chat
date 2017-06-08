@@ -6,6 +6,16 @@
     android:layout_height="match_parent"
     tools:context="com.randar.androichat.MainActivity">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+    <ListView
+        android:id="@+id/listView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </ListView>
+
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,9 +27,8 @@
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
-
     </android.support.design.widget.AppBarLayout>
-
+    </LinearLayout>
     <include layout="@layout/content_main" />
 
     <android.support.design.widget.FloatingActionButton
@@ -30,17 +39,4 @@
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@android:drawable/ic_dialog_email" />
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true" >
-
-        <ListView
-            android:id="@+id/listView1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-        </ListView>
-
-    </ScrollView>
 </android.support.design.widget.CoordinatorLayout>

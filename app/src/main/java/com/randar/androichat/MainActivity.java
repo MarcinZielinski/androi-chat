@@ -157,6 +157,12 @@ public class MainActivity extends AppCompatActivity {
         mainHandler.post(myRunnable);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        logout();
+    }
+
     /**
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
