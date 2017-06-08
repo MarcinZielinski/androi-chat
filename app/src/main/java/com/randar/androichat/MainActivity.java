@@ -3,9 +3,11 @@ package com.randar.androichat;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.InputType;
+import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -18,16 +20,15 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
-    // Used to load the 'native-lib' library on application startup.
-    static {
-        System.loadLibrary("native-lib");
-        System.loadLibrary("msg-receiver");
-    }
-
     private String message;
     private TextView tv;
     private AlertDialog alertDialog;
     private EditText messageEditText;
+
+    // Used to load the 'native-lib' library on application startup.
+    static {
+        System.loadLibrary("msg-receiver");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Log.d("OMG IM HERE","NGMGGASMLKA");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -88,17 +91,22 @@ public class MainActivity extends AppCompatActivity {
         });
 
         tv = (TextView) findViewById(R.id.sample_text);
+        Log.d("TAGGG","I'm so far awayyy");
         if(connectToServer() == 0) {
             tv.setText("OH MY GOD IM CONNECTED");
         } else {
             tv.setText("I tried at lesat....");
         }
+        Log.d("here is bug,","jdskaldjkla");
+        Intent intent = getIntent();
+        String username = intent.getStringExtra(LoginActivity.EXTRA_MESSAGE);
 
-        if(login("Mrz355") == 0) {
+        if(login(username) == 0) {
             tv.setText(tv.getText()+" i'm logged in");
         } else {
             tv.setText(tv.getText()+" i'm not logged..");
         }
+        Log.d("here i end my life","enedddd");
         listenCoroutine();
     }
 

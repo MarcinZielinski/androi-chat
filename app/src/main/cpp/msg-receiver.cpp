@@ -92,6 +92,7 @@ Java_com_randar_androichat_MainActivity_stringFromJNI(
 
 JNIEXPORT jint JNICALL
 Java_com_randar_androichat_MainActivity_connectToServer(JNIEnv *env, jobject instance) {
+    log("i'm here in c");
     if((socket_fd = socket(AF_INET,SOCK_STREAM,0)) == -1) {
         _perror("socket");
         return -1;
@@ -138,6 +139,7 @@ Java_com_randar_androichat_MainActivity_login(JNIEnv *env, jobject instance, jst
     }
 
     if(msg.type == SUCCESS) {
+        log("logged in successfully");
         log("logged in successfully");
     } else {
         log("failed to login");
