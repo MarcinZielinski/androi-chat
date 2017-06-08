@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.InputType;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     // Used to load the 'native-lib' library on application startup.
     static {
         System.loadLibrary("native-lib");
+        System.loadLibrary("msg-receiver");
     }
 
     private String message;
@@ -97,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             tv.setText(tv.getText()+" i'm not logged..");
         }
-
+        listenCoroutine();
     }
 
     @Override
@@ -122,6 +124,18 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    void newMessage(final String message) {
+        Handler mainHandler = new Handler(this.getMainLooper());
+
+        Runnable myRunnable = new Runnable() {
+            @Override
+            public void run() {
+                tv.setText(message);
+            } // This is your code
+        };
+        mainHandler.post(myRunnable);
+    }
+
     /**
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
@@ -129,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
     public native String stringFromJNI();
     public native int connectToServer();
     public native int login(String username);
+    public native int listenCoroutine();
     public native int sendMessage(String message);
     public native int logout(); // TODO: put it int some onStop(), but do not forget to do not able disconnection from server while rotating phone!
 }
