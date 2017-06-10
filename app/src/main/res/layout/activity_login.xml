@@ -23,4 +23,6 @@
         android:layout_height="wrap_content"
         android:onClick="sendMessage"
         android:text="Login" />
+
+    <include layout="@layout/progress_indicator" />
 </LinearLayout>

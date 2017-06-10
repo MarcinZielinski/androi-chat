@@ -12,6 +12,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -19,7 +20,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
     private EditText messageEditText;
     private ListView list ;
     private ArrayAdapter<String> adapter ;
+    static Toast toast;
+    private String username;
+    private ProgressBar pb;
     ArrayList<String> messageList;
 
     // Used to load the 'native-lib' library on application startup.
@@ -43,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Intent intent = getIntent();
+        username = intent.getStringExtra(LoginActivity.EXTRA_MESSAGE);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -99,21 +108,10 @@ public class MainActivity extends AppCompatActivity {
         messageList = new ArrayList<>();
 
         tv = (TextView) findViewById(R.id.sample_text);
-        if(connectToServer() == 0) {
-            tv.setText("OH MY GOD IM CONNECTED");
-        } else {
-            tv.setText("I tried at lesat....");
-        }
-        Intent intent = getIntent();
-        String username = intent.getStringExtra(LoginActivity.EXTRA_MESSAGE);
-
-        if(login(username) == 0) {
-            tv.setText(tv.getText()+" i'm logged in");
-        } else {
-            tv.setText(tv.getText()+" i'm not logged..");
-        }
         listenCoroutine();
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -160,17 +158,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        logout();
     }
 
     /**
      * A native method that is implemented by the 'native-lib' native library,
      * which is packaged with this application.
      */
-    public native String stringFromJNI();
-    public native int connectToServer();
-    public native int login(String username);
     public native int listenCoroutine();
     public native int sendMessage(String message);
-    public native int logout(); // TODO: put it int some onStop(), but do not forget to do not able disconnection from server while rotating phone!
 }
