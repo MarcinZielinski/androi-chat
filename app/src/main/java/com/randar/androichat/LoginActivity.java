@@ -84,22 +84,29 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         logout();
-        //finish();
     }
 
     void connectionEstablished() {
+        Log.d("connection","established");
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+        mainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                progressIndicator.setVisibility(View.GONE);
+                button.setEnabled(true);
+            }
+        });
         if(login(username) == 0) {
             Intent intent = new Intent(this, MainActivity.class);
             String message = username;
             intent.putExtra(EXTRA_MESSAGE, message);
             startActivity(intent);
         } else {
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
+            mainHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     toast = Toast.makeText(getApplicationContext(), "Username is already taken.", Toast.LENGTH_LONG);
                     toast.show();
-                    button.setEnabled(true);
                 }
             });
             logout();
