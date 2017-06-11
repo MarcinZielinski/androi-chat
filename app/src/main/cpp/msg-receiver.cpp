@@ -76,6 +76,24 @@ void *message_receiver(void *argv) {
                 env->CallVoidMethod(globalInstance, method, _username, message);
                 break;
             }
+            case USER_LEFT: {
+                if(read(socket_fd, &msg, sizeof(msg)) == -1) {
+                    _perror("message_receiver user left");
+                    coroutineStarted = 0;
+                    return NULL;
+                }
+
+                struct tm *tv;
+                tv = localtime(&msg.timestamp);
+                char * time_c = asctime(tv);
+
+                jstring time = env->NewStringUTF(time_c);
+                jstring _username = env->NewStringUTF(msg.name);
+                jmethodID method = env->GetMethodID(cls, "userLeft",
+                                                    "(Ljava/lang/String;Ljava/lang/String;)V");
+                env->CallVoidMethod(globalInstance, method, _username, time);
+                free(tv);
+            }
             case PING: {
                 type = PONG;
                 if (write(socket_fd, &type, sizeof(type)) == -1) {
@@ -303,9 +321,9 @@ Java_com_randar_androichat_MainActivity_sendMessage(JNIEnv *env, jobject instanc
 
     msg_t msg;
     msg.type = MESSAGE;
-//    msg_type_t type = MESSAGE;
     strcpy(msg.name,username);
     strcpy(msg.message,message);
+    time(&msg.timestamp);
 
     if(write(socket_fd, &msg, sizeof(msg)) == -1) {
         _perror("sendMessage: write");
@@ -331,7 +349,7 @@ Java_com_randar_androichat_LoginActivity_logout(JNIEnv *env, jobject instance) {
     //    if(pthread_kill(connection_tid, SIGUSR2)) {
     //        _perror("pthread_kill connection");
     //    }
-        connectionCoroutineStarted = 0;
+    //    connectionCoroutineStarted = 0;
     }
     int res = 0;
     if (socket_fd != -1) {

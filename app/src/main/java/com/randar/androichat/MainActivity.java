@@ -135,6 +135,26 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    void userLeft(final String username, final String time) {
+        messageList.add(username+" disconnected");
+
+        Handler mainHandler = new Handler(this.getMainLooper());
+
+        Runnable myRunnable = new Runnable() {
+            @Override
+            public void run() {
+                tv.setText(username+": "+message);
+
+                adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.message_row, messageList);
+
+                list.setAdapter(adapter);
+
+
+            } // This is your code
+        };
+        mainHandler.post(myRunnable);
+    }
+
     void newMessage(final String username, final String message) {
         messageList.add(username+": "+message);
 
