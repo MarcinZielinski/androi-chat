@@ -200,7 +200,6 @@ void *connectToServer(void *args) {
 extern "C"
 JNIEXPORT jint JNICALL
 Java_com_randar_androichat_MainActivity_listenCoroutine(JNIEnv *env, jobject instance) {
-    log("listen coroutine started");
     env->GetJavaVM(&javaVM);
     jclass cls = env->GetObjectClass(instance);
     globalClass = (jclass) env->NewGlobalRef(cls);
@@ -212,9 +211,6 @@ Java_com_randar_androichat_MainActivity_listenCoroutine(JNIEnv *env, jobject ins
     if(pt == 0) {
         coroutineStarted = 1;
     }
-    //if(pt != 0) {
-    //    _perror("pthread_create");
-    //}
 
     return 0;
 }
@@ -248,7 +244,6 @@ Java_com_randar_androichat_LoginActivity_connectToServer(JNIEnv *_env, jobject i
 JNIEXPORT jint JNICALL
 Java_com_randar_androichat_LoginActivity_login(JNIEnv *env, jobject instance, jstring jusername) {
     const char *_username = env->GetStringUTFChars(jusername, 0);
-    log("login cpp method started");
 
     int res = 0;
 
@@ -309,7 +304,6 @@ Java_com_randar_androichat_MainActivity_sendMessage(JNIEnv *env, jobject instanc
 JNIEXPORT jint JNICALL
 Java_com_randar_androichat_LoginActivity_logout(JNIEnv *env, jobject instance) {
     if(coroutineStarted == 1) {
-        log("killing listen coroutine");
         if(pthread_kill(tid, SIGUSR2)) {
             _perror("pthread_kill listen");
         }
