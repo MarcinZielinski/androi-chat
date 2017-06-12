@@ -2,12 +2,6 @@
 // Created by Mrz355 on 07.06.17.
 //
 
-#include <jni.h>
-#include <sys/syscall.h>
-#include <stdio.h>
-#include <pthread.h>
-#include <sched.h>
-#include <unistd.h>
 #include "msg-receiver.h"
 
 #define APPNAME "androi-chat"
@@ -23,7 +17,6 @@ jclass globalClass;
 jobject globalInstance;
 
 int coroutineStarted;
-int connectionCoroutineStarted;
 
 extern "C"
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void * reserved)  {
@@ -53,8 +46,6 @@ void *message_receiver(void *argv) {
 
     int s = 1;
     while(s) {
-
-        log("readddinnggg");
         if(read(socket_fd,&type,sizeof(type)) == -1) {
             _perror("message_receiver: read type");
             coroutineStarted = 0;
@@ -73,7 +64,8 @@ void *message_receiver(void *argv) {
                 jstring _username = env->NewStringUTF(msg.name);
 
                 struct tm *time;
-                time = localtime(&msg.timestamp);
+                time_t timestamp = atoi(msg.timestamp);
+                time = localtime(&timestamp);
                 char buffer[7];
                 strftime(buffer, 7, "%H:%M ", time);
                 jstring _time = env->NewStringUTF(buffer);
@@ -93,10 +85,9 @@ void *message_receiver(void *argv) {
                 break;
             }
             default: {
-                _perror("switch wrong type");
+                break;
             }
         }
-        log("alreeady reaaaad");
     }
     javaVM->DetachCurrentThread();
     pthread_exit(NULL);
@@ -104,8 +95,6 @@ void *message_receiver(void *argv) {
 }
 
 void thread_failure_exit(jclass cls) {
-    connectionCoroutineStarted = 0;
-
     jmethodID method = env->GetMethodID(cls, "connectionRefused", "()V");
     env->CallVoidMethod(globalInstance, method);
 
@@ -144,8 +133,7 @@ void *connectToServer(void *args) {
         return (void *) -1;
     }
 
-    //char *addr = "88.99.161.145";
-    char *addr = "192.168.43.209";
+    char *addr = "176.119.57.133";
     uint16_t port = 36000;
 
     struct sockaddr_in in_addr;
@@ -204,7 +192,6 @@ void *connectToServer(void *args) {
     jmethodID method = env->GetMethodID(cls, "connectionEstablished", "()V");
     env->CallVoidMethod(globalInstance, method);
 
-    connectionCoroutineStarted = 0;
     javaVM->DetachCurrentThread();
     pthread_exit(NULL);
     return NULL;
@@ -252,7 +239,6 @@ Java_com_randar_androichat_LoginActivity_connectToServer(JNIEnv *_env, jobject i
     globalInstance = env->NewGlobalRef(instance);
 
     if(pthread_create(&connection_tid,NULL,connectToServer,NULL) == 0) {
-        connectionCoroutineStarted = 1;
         return 0;
     } else {
         return -1;
@@ -306,6 +292,9 @@ Java_com_randar_androichat_MainActivity_sendMessage(JNIEnv *env, jobject instanc
     msg.type = MESSAGE;
     strcpy(msg.name,username);
     strcpy(msg.message,message);
+    char timebuf[MAX_TIME_LEN];
+    sprintf(timebuf,"%zu",time(NULL));
+    strcpy(msg.timestamp,timebuf);
 
     if(write(socket_fd, &msg, sizeof(msg)) == -1) {
         _perror("sendMessage: write");
