@@ -7,6 +7,7 @@
 
 #define MAX_NAME_LEN 108
 #define MAX_MESSAGE_LEN 512
+#define MAX_TIME_LEN 11
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,13 +42,13 @@ typedef struct msg {
     msg_type_t type;
     char name[MAX_NAME_LEN];
     char message[MAX_MESSAGE_LEN];
-    time_t timestamp;
+    char timestamp[MAX_TIME_LEN];
 } msg_t;
 
 typedef struct msg_no_type {
     char name[MAX_NAME_LEN];
     char message[MAX_MESSAGE_LEN];
-    time_t timestamp;
+    char timestamp[MAX_TIME_LEN];
 } msg_no_type_t;
 
 #endif //ANDROI_CHAT_MSG_RECEIVER_H
