@@ -79,9 +79,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         message = messageEditText.getText().toString();
                         if(sendMessage(message) == -1) {
-                            tv.setText("Unable to send the message...");
-                        } else {
-                            tv.setText(message);
+                            Log.d("ERROR","cannot send message");
                         }
                     }
                 });
@@ -106,8 +104,6 @@ public class MainActivity extends AppCompatActivity {
 
         list = (ListView) findViewById(R.id.listView1);
         messageList = new ArrayList<>();
-
-        tv = (TextView) findViewById(R.id.sample_text);
         listenCoroutine();
     }
 
@@ -135,41 +131,20 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    void userLeft(final String username, final String time) {
-        messageList.add(username+" disconnected");
+    void newMessage(final String username, final String message, final String time) {
 
         Handler mainHandler = new Handler(this.getMainLooper());
-
         Runnable myRunnable = new Runnable() {
             @Override
             public void run() {
-                tv.setText(username+": "+message);
-
-                adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.message_row, messageList);
-
-                list.setAdapter(adapter);
-
-
-            } // This is your code
-        };
-        mainHandler.post(myRunnable);
-    }
-
-    void newMessage(final String username, final String message) {
-        messageList.add(username+": "+message);
-
-        Handler mainHandler = new Handler(this.getMainLooper());
-
-        Runnable myRunnable = new Runnable() {
-            @Override
-            public void run() {
-                tv.setText(username+": "+message);
-
-                adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.message_row, messageList);
-
-                list.setAdapter(adapter);
-
-
+                messageList.add(time+username+message);
+                if(adapter == null) {
+                    adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.message_row, messageList);
+                    list.setAdapter(adapter);
+                } else {
+                    adapter.notifyDataSetChanged();
+                }
+                list.smoothScrollToPosition(adapter.getCount() - 1);
             } // This is your code
         };
         mainHandler.post(myRunnable);

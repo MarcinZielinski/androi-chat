@@ -29,7 +29,7 @@ void _perror(char* error_msg);
 void log(char *msg);
 
 typedef enum msg_type {
-    LOGIN = 0, MESSAGE = 1, SUCCESS = 2, FAILURE = 3, PING = 4, PONG = 5, USER_LEFT = 6
+    LOGIN = 0, MESSAGE = 1, SUCCESS = 2, FAILURE = 3, PING = 4, PONG = 5
 } msg_type_t;
 
 typedef struct client {
@@ -39,15 +39,15 @@ typedef struct client {
 
 typedef struct msg {
     msg_type_t type;
-    time_t timestamp;
     char name[MAX_NAME_LEN];
     char message[MAX_MESSAGE_LEN];
+    time_t timestamp;
 } msg_t;
 
 typedef struct msg_no_type {
-    time_t timestamp;
     char name[MAX_NAME_LEN];
     char message[MAX_MESSAGE_LEN];
+    time_t timestamp;
 } msg_no_type_t;
 
 #endif //ANDROI_CHAT_MSG_RECEIVER_H
